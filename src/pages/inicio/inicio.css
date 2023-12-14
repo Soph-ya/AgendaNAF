@@ -1,0 +1,40 @@
+.home {
+  font-family: Arial, sans-serif;
+  margin: 0 600px;
+  padding-bottom: 50px;
+  max-width: 1000px;
+  margin: 0 auto;
+  font-family: 'Rethink Sans', sans-serif;
+  
+  
+}
+.titulo_inicio {
+  font-weight:bolder;
+  font-size: 30px;
+
+}
+
+.sessao_paragrafo {
+  margin: 20px 0;
+  line-height: 1.6;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+}
+
+.title-image {
+  width: 600px;
+  margin-right: 20px;
+  padding-top: 20px;
+}
+
+.titulo_paragrafo {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+
+
+

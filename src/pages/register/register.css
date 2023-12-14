@@ -1,0 +1,108 @@
+* {
+    margin: 0;
+    font-family: 'Rethink Sans', sans-serif;
+}
+html {
+    height: 100%;
+  }
+
+.register {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    box-sizing: border-box;
+    padding: 30px;
+}
+
+.container_geral_registro {
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 450px;
+    height: 100%;
+    background-color: #FFFFFF;
+    border: none;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.titulo {
+    display: flex;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 23px;
+
+}
+
+.campo-register {
+    display: grid;
+    padding: 15px;
+}
+
+#email,
+#nome,
+#cidade,
+#dataNascimento,
+#tipoUsuario,
+#matricula,
+#senha,
+#confirmarSenha,
+#cpf,
+#password,
+#confirmPassword {
+    border-color: #9F9F9F;
+    width: 315px;
+    height: 20px;
+    border: none;
+    border-bottom: 2px solid #CBC5BF;
+
+}
+
+.label-register {
+    padding-bottom: 5px;
+    font-size: 20px;
+    border: none;
+}
+
+input:focus, select:focus {
+    outline: none;
+  }
+
+.btn_register {
+    background-color: #006B64;
+    padding: 8px 16px;
+    margin: 40px 0 30px 0;
+    text-align: center;
+    color: #ffff;
+    font-size: 20px;
+    border-radius: 5px;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn_register:hover {
+    background-color: #006b64c8; 
+}
+
+.mensagem-erro {
+    color: red;
+    margin-top: 10px;
+    font-size: 11px;
+}
+
+.mensagem-login {
+    display: flex;
+    justify-content: center;
+}
+
+.login-div {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    box-sizing: border-box;
+    height: 100%;
+}

@@ -1,0 +1,376 @@
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;600&family=Rethink+Sans&family=Roboto:ital,wght@0,100;0,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Poppins:wght@100;600&family=Rethink+Sans&family=Roboto:ital,wght@0,100;0,400;1,700&display=swap');
+
+* {
+    margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+
+}
+
+.titulo_inicial {
+    background-color: #006B64;
+    height: 100px;
+    padding: 20px;
+    text-align: justify;
+    color: #ffff;
+    border: solid;
+    font-family: 'Rethink Sans', sans-serif;;
+}
+
+.agendamento {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 0;
+
+}
+
+.marcacao_data {
+    padding: 20px 20px 20px 0;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    height: 100vh;
+
+    
+}
+
+.calendar-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 409px;
+    margin-left: 30px;
+
+    
+}
+
+
+.react-datepicker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    margin: 30px;
+    width: 500px;
+
+}
+
+.custom-calendar {
+    .react-datepicker__header {
+        background-color: #fff;
+        color: #fff;
+        font-family: 'Josefin Sans', cursive;
+    
+}
+
+    .react-datepicker__month-container {
+        width: 500px;
+
+    }
+    
+    .react-datepicker__day {
+        margin: 8px;
+    }
+
+    .react-datepicker__day--selected{
+        
+        background-color: #006B64;
+    }
+    
+}
+
+.horario-container {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0 0 30px;
+    width: 100%;
+    height: 409px;
+    
+}
+
+.title {
+    text-align: justify;
+    margin: 10px 10px 10px 0;
+    font-family: 'Josefin Sans', cursive;
+}
+
+.selecionar_horarios {
+    margin: 20px 0 20px 0;
+    width: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.horarios {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-width: 300px;
+    margin: auto; 
+    justify-content: center;
+
+    }
+      
+.btn_horario {
+    width: 90px;
+    height: 40px;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #F3F2F5;
+    border-radius: 5px;
+    border: none;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    margin: 5px;
+      }
+      
+.btn_horario:hover,  .btn_horario.ativo{
+    background-color: #006B64;
+    color: #ffff;
+      }   
+
+.btn_agendar {
+    width: 200px;
+    height: 30px;
+    border-radius: 8px;
+    }
+
+.btn_agendar.active {
+    background-color: #006B64;
+    color: #ffff;
+
+    }
+
+.btn_concluir {
+    display: flex;
+    justify-content: center; 
+    margin: 50px 50px 50px 0;   
+}
+
+.info_container {
+    background-color: #F5F5F5;
+    display: flex;
+    justify-content: center;
+    padding: 0px;
+    margin-top: 30px;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    height: 100vh;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.dados_login {
+    height: 200px;
+    width: 100%;
+    display: flex;
+}
+
+.user {
+    justify-content: center;
+    align-items: center;
+    margin: 30px;
+    
+}
+
+
+.icon-user {
+    display: flex;
+    justify-content: center;
+    padding: 5px;
+    
+}
+
+.dados_atendimento {
+    margin: 50px 0px 0px 80px ;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon-clock {
+    margin-top: 15px;
+
+
+}
+
+.agendamento_organization {
+    display: flex;
+    justify-content: center;
+}
+
+.duracao {
+    position: relative;
+    top: 17px;
+    left: 5px;;
+    font-size: 14px;
+}
+
+
+.texto-principal {
+    height: 100%;
+    width: 100%;
+    margin: 50px;
+}
+
+.p1, .p2, .p3 {
+    padding: 25px;
+}
+
+.p4 {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+}
+
+ .modal_conteudo {
+  
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    width: 500px;
+    height: 600px;
+    border-radius: 10px;
+    background-color: #efefef;
+
+  }
+
+  .mensagem_agendamento {
+    margin-bottom: 80px;
+  }
+
+  .feedback {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .btn_fechar {
+    margin: 20px;
+    width: 200px;
+    align-self: center;
+    border-radius: 10px;
+    padding: 5px;
+    background-color: #006B64;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .btn_fechar:hover {
+    background-color: #01514c;
+    font-weight: 600;
+  }
+
+  textarea {
+    margin:10px;
+  }
+
+
+  .ReactModal__Overlay {
+    opacity: 0;
+    transition: opacity 200ms ease-in-out;
+    background-color: #dedede;
+    border: #006B64;
+    border-radius: 8px;
+  }
+  
+  .ReactModal__Overlay--after-open {
+    opacity: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+  }
+  
+  .ReactModal__Overlay--before-close {
+    opacity: 0;
+  }
+  
+
+
+  @media only screen and (max-width: 627px) {
+    .agendamento {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .marcacao_data,
+    .info_container {
+      width: 100%;
+      height: auto;
+      margin: 0;
+    }
+  
+    .calendar-container {
+      margin-left: 0;
+    }
+  
+    .react-datepicker {
+      width: 100%;
+      margin: 20px 0;
+    }
+  
+    .horario-container {
+      margin: 20px 0;
+    }
+  
+    .titulo_inicial,
+    .title,
+    .selecionar_horarios,
+    .btn_concluir {
+      margin: 0;
+    }
+  
+    .dados_login {
+      flex-direction: column;
+      height: auto;
+    }
+  
+    .user {
+      margin: 20px 0;
+    }
+  
+    .dados_atendimento {
+      margin: 20px 0;
+    }
+  
+    .icon-clock {
+      margin-top: 0;
+    }
+  
+    .texto-principal {
+      margin: 20px;
+    }
+  
+    .modal_conteudo {
+      width: 100%;
+      height: auto;
+    }
+  
+    .mensagem_agendamento {
+      margin-bottom: 20px;
+    }
+  
+    .btn_fechar {
+      width: 100%;
+    }
+  
+    textarea {
+      margin: 10px 0;
+    }
+  }
