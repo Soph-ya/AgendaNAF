@@ -55,18 +55,7 @@ A partir desse ponto, você pode explorar e interagir com as funcionalidades do 
 
 
 ## :handshake: DESENVOLVEDORA
-<table>
-  <tr>
-      <td align="center">
-      <a href="https://github.com/Soph-ya">
-        <img src="https://avatars.githubusercontent.com/u/56259137?v=4" width="100px;" alt="Foto de Tati Alves no GitHub"/><br>
-        <sub>
-          <b>Sophia</b>
-        </sub>
-      </a>
-    </td>
-  </tr>
-</table> www.linkedin.com/in/sophia-freitas-fullstack
+<p> <Strong> Sophia Resende de Freitas </Strong></p>
 </p>
 <h3 align="left">Connect with me:</h3>
 <p align="left">
@@ -76,7 +65,7 @@ A partir desse ponto, você pode explorar e interagir com as funcionalidades do 
 <h3 align="left">Languages and Tools:</h3>
 <p align="left">  
 <a href="" target="_blank" rel="noreferrer"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original-wordmark.svg"" alt="react" width="40" height="40"/> </a> 
-<a href="" target="_blank" rel="noreferrer"> <img src=https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-plain.svg"" alt="javascript" width="40" height="40"/> </a> 
+<a href="" target="_blank" rel="noreferrer"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="javascript" width="40" height="40"/> </a> 
 <a href="" target="_blank" rel="noreferrer"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-plain-wordmark.svg"" alt="html" width="40" height="40"/> </a> 
 <a href="" target="_blank" rel="noreferrer"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-plain-wordmark.svg"" alt="git" width="40" height="40"/> </a> 
 </p>
