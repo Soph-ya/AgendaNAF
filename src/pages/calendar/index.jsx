@@ -10,6 +10,10 @@ import { CiClock2 } from "react-icons/ci";
 import { VscCheckAll } from "react-icons/vsc";
 import Header from "../../components/header";
 import Footer from "../../components/Footer";
+import { format } from "date-fns";
+import { getDatabase, ref, set } from "firebase/database";
+import { getAuth } from "firebase/auth";
+
 
 export const setItem = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
@@ -21,7 +25,6 @@ export const getItem = (key) => {
 
 const Agendamento = () => {
   const [dataSelecionada, setDataSeleciona] = useState(null);
-  const [turnoSelecionado, setTurnoSelecionado] = useState(null);
   const [horarioSelecionado, setHorarioSelecionado] = useState(null);
   const [botaoAtivo, setBotaoAtivo] = useState(false);
   const [agendamentoRealizado, setAgendamentoRealizado] = useState(false);
@@ -59,23 +62,53 @@ const Agendamento = () => {
     setBotaoAtivo(false);
   };
 
+  const salvarAgendamento = (data, horario) => {
+    const auth = getAuth();
+    const database = getDatabase();
+    const dataFormatada = format(dataSelecionada, "dd/MM/yyyy");
+    
+    const usuarioLogado = getItem("usuarioLogado");
+  
+    if (usuarioLogado) {
+      const userId = usuarioLogado.uid;
+  
+      const agendamentoRef = ref(database, `agendamentos/${userId}`);
+      const dataFormatada = format(data, "dd/MM/yyyy"); 
+
+      set(agendamentoRef, {
+        data: dataFormatada,
+        horario: horario,
+        nome: usuarioLogado.nome,
+      })
+        .then(() => {
+          console.log("Agendamento salvo com sucesso!");
+        })
+        .catch((error) => {
+          console.error("Erro ao salvar agendamento: ", error);
+        });
+    } else {
+      console.error("Usuário não logado.");
+    }
+  };
+  
+
   const handleAgendar = () => {
     console.log("Data selecionada:", dataSelecionada);
-    console.log("Turno selecionado:", turnoSelecionado);
     console.log("Horário selecionado:", horarioSelecionado);
-
+  
+    salvarAgendamento(dataSelecionada, horarioSelecionado);
     setDataSeleciona(null);
-    setTurnoSelecionado(null);
     setHorarioSelecionado(null);
     setBotaoAtivo(false);
     setAgendamentoRealizado(true);
-
+  
     openModal();
-
+  
     setTimeout(() => {
       setAgendamentoRealizado(false);
     }, 5000);
   };
+  
 
   return (
     <>

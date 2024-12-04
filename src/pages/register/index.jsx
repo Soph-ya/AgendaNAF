@@ -4,6 +4,9 @@ import "./register.css";
 import accountingg from "../../img/accountingg.jpg";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import { getDatabase, ref, set } from "firebase/database";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import '../../assets/firebaseConfig';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -16,6 +19,8 @@ const Register = () => {
   const [tipoUsuario, setTipoUsuario] = useState("");
   const [matricula, setMatricula] = useState("");
   const [cpf, setCpf] = useState("");
+  const auth = getAuth();
+  const database = getDatabase();
 
   const validarCampos = () => {
     if (
@@ -31,6 +36,17 @@ const Register = () => {
       return false;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("Por favor, insira um e-mail válido.");
+      return false;
+    }
+
+    if (senha.length < 6) {
+      alert("A senha deve ter no mínimo 6 caracteres.");
+      return false;
+    }
+
     if (senha !== confirmarSenha) {
       alert("A senha e a confirmação de senha não correspondem.");
       return false;
@@ -39,13 +55,13 @@ const Register = () => {
     return true;
   };
 
-  const salvarUsuario = (e) => {
+  const salvarUsuario = async (e) => {
     e.preventDefault();
-
+  
     if (!validarCampos()) {
       return;
     }
-
+    
     const novoUsuario = {
       email,
       senha,
@@ -54,22 +70,21 @@ const Register = () => {
       dataNascimento,
       tipoUsuario,
       id: new Date().getTime(),
-      matricula: tipoUsuario === "Aluno" ? matricula : undefined,
-      cpf: tipoUsuario === "Cliente" ? cpf : undefined,
+      ...(tipoUsuario === "Aluno" || tipoUsuario === "Professor" ? { matricula } : {}),
+      ...(tipoUsuario === "Cliente" ? { cpf } : {}),
     };
-
+  
     try {
-      const usuariosAtuais = JSON.parse(localStorage.getItem("usuarios")) || [];
-      localStorage.setItem(
-        "usuarios",
-        JSON.stringify([...usuariosAtuais, novoUsuario])
-      );
-
-      alert("Usuário cadastrado com sucesso");
+      const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+      const userId = userCredential.user.uid;
+  
+      await set(ref(database, `usuarios/${userId}`), novoUsuario);
+  
+      alert("Usuário cadastrado com sucesso!");
       navigate("/login");
     } catch (error) {
-      console.error(error);
-      alert("Ocorreu um erro ao cadastrar o usuário");
+      console.error("Erro ao criar usuário:", error.message);
+      alert("Ocorreu um erro ao criar o usuário. Tente novamente.");
     }
   };
 
@@ -186,18 +201,11 @@ const Register = () => {
                         .slice(0, 11)
                         .replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
                       setCpf(formattedCpf);
-                      if (!/^\d+$/.test(cpfValue)) {
-                        e.target.classList.add("erro-input");
-                      } else {
-                        e.target.classList.remove("erro-input");
-                      }
                     }}
                   />
-                  {/^\d+$/.test(cpf) ? null : (
-                    <p className="mensagem-erro">*somente números</p>
-                  )}
                 </div>
               )}
+
               <div className="campo-register">
                 <label className="label-register" htmlFor="senha">
                   Senha

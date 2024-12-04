@@ -4,6 +4,9 @@ import './login.css';
 import accountingg from '../../img/accountingg.jpg';
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getDatabase, ref, get } from "firebase/database";
+
 
 
 export const setItem = (key, value) => {
@@ -19,25 +22,31 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
-  const realizarLogin = (e) => {
+  const realizarLogin = async (e) => {
     e.preventDefault();
-
-    const usuarios = getItem('usuarios') || [];
-
-    const usuarioExistente = usuarios.find(
-      (usuario) => usuario.email === email && usuario.senha === senha
-    );
-
-    if (usuarioExistente) {
-      setItem('usuarioLogado', {
-        ...usuarioExistente,
-        nome: usuarioExistente.nome,
-      });
-
-      alert('Login realizado com sucesso');
-      navigate('/calendar');
-    } else {
-      alert('Usuário não cadastrado ou Credenciais Inválidas');
+  
+    const auth = getAuth();
+    const database = getDatabase(); 
+  
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, senha);
+      
+      const userId = userCredential.user.uid;
+  
+      const usuarioRef = ref(database, `usuarios/${userId}`);
+      const snapshot = await get(usuarioRef);
+  
+      if (snapshot.exists()) {
+        const usuario = snapshot.val();
+  
+        alert('Login realizado com sucesso');
+        navigate('/calendar');
+      } else {
+        alert('Usuário não encontrado');
+      }
+    } catch (error) {
+      console.error('Erro ao realizar login:', error.message);
+      alert('Credenciais inválidas ou erro de login');
     }
   };
 
