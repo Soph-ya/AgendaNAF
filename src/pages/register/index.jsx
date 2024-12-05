@@ -4,7 +4,7 @@ import "./register.css";
 import accountingg from "../../img/accountingg.jpg";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import { getDatabase, ref, remove, set } from "firebase/database";
+import { getDatabase, ref, set } from "firebase/database";
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import '../../assets/firebaseConfig';
 
@@ -15,21 +15,12 @@ const Register = () => {
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [nome, setNome] = useState("");
   const [cidade, setCidade] = useState("");
-  const [tipoUsuario, setTipoUsuario] = useState("");
-  const [matricula, setMatricula] = useState("");
   const [cpf, setCpf] = useState("");
   const auth = getAuth();
   const database = getDatabase();
 
   const validarCampos = () => {
-    if (
-      !email ||
-      !senha ||
-      !confirmarSenha ||
-      !nome ||
-      !cidade ||
-      !tipoUsuario
-    ) {
+    if (!email || !senha || !confirmarSenha || !nome || !cidade || !cpf) {
       alert("Por favor, preencha todos os campos obrigatórios.");
       return false;
     }
@@ -50,37 +41,40 @@ const Register = () => {
       return false;
     }
 
+    const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+    if (!cpfRegex.test(cpf)) {
+      alert("Por favor, insira um CPF válido.");
+      return false;
+    }
+
     return true;
   };
 
   const salvarUsuario = async (e) => {
     e.preventDefault();
-  
+
     if (!validarCampos()) {
       return;
     }
-    
+
     const novoUsuario = {
       email,
-      senha,
       nome,
       cidade,
-      tipoUsuario,
+      cpf,
       id: new Date().getTime(),
-      ...(tipoUsuario === "Aluno" || tipoUsuario === "Professor" ? { matricula } : {}),
-      ...(tipoUsuario === "Cliente" ? { cpf } : {}),
     };
-  
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
       const userId = userCredential.user.uid;
-  
+
       await updateProfile(userCredential.user, {
         displayName: nome,
       });
-  
+
       await set(ref(database, `usuarios/${userId}`), novoUsuario);
-  
+
       alert("Usuário cadastrado com sucesso!");
       navigate("/login");
     } catch (error) {
@@ -140,58 +134,25 @@ const Register = () => {
                   onChange={(e) => setCidade(e.target.value)}
                 />
               </div>
+
               <div className="campo-register">
-                <select
-                  name="tipoUsuario"
-                  id="tipoUsuario"
-                  value={tipoUsuario}
-                  onChange={(e) => setTipoUsuario(e.target.value)}
-                  style={{ fontSize: "18px", height: "45px", color: "blue" }}
-                >
-                  <option value="" disabled hidden>
-                    Tipo de Usuário
-                  </option>
-                  <option value="Aluno">Aluno</option>
-                  <option value="Professor">Professor</option>
-                  <option value="Cliente">Cliente</option>
-                </select>
+                <label className="label-register" htmlFor="cpf">
+                  CPF
+                </label>
+                <input
+                  type="text"
+                  name="cpf"
+                  id="cpf"
+                  value={cpf}
+                  onChange={(e) => {
+                    const cpfValue = e.target.value.replace(/\D/g, "");
+                    const formattedCpf = cpfValue
+                      .slice(0, 11)
+                      .replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+                    setCpf(formattedCpf);
+                  }}
+                />
               </div>
-
-              {(tipoUsuario === "Aluno" || tipoUsuario === "Professor") && (
-                <div className="campo-register">
-                  <label className="label-register" htmlFor="matricula">
-                    Matrícula
-                  </label>
-                  <input
-                    type="text"
-                    name="matricula"
-                    id="matricula"
-                    value={matricula}
-                    onChange={(e) => setMatricula(e.target.value)}
-                  />
-                </div>
-              )}
-
-              {tipoUsuario === "Cliente" && (
-                <div className="campo-register">
-                  <label className="label-register" htmlFor="cpf">
-                    CPF
-                  </label>
-                  <input
-                    type="text"
-                    name="cpf"
-                    id="cpf"
-                    value={cpf}
-                    onChange={(e) => {
-                      const cpfValue = e.target.value.replace(/\D/g, "");
-                      const formattedCpf = cpfValue
-                        .slice(0, 11)
-                        .replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-                      setCpf(formattedCpf);
-                    }}
-                  />
-                </div>
-              )}
 
               <div className="campo-register">
                 <label className="label-register" htmlFor="senha">

@@ -13,40 +13,55 @@ function Adm() {
       .then((snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
-          setAgendamentos(
-            Object.keys(data).map((id) => ({ id, ...data[id] }))
-          );
+          const agendamentosArray = [];
+          Object.keys(data).forEach((ano) => {
+            Object.keys(data[ano]).forEach((mes) => {
+              Object.keys(data[ano][mes]).forEach((dia) => {
+                const horarios = data[ano][mes][dia];
+                Object.keys(horarios).forEach((horario) => {
+                  const agendamento = horarios[horario];
+                  agendamentosArray.push({
+                    data: `${dia}/${mes}/${ano}`,
+                    horario,
+                    nome: agendamento.nome,
+                    email: agendamento.email,
+                  });
+                });
+              });
+            });
+          });
+          setAgendamentos(agendamentosArray);
         } else {
           console.log("Nenhum agendamento disponível");
           setAgendamentos([]);
         }
       })
       .catch((error) => {
-        console.error(error);
+        console.error("Erro ao buscar agendamentos:", error);
       });
   }
 
   useEffect(() => {
     fetchAppointments();
   }, []);
-  
+
   return (
     <>
-    <div className="container">
-    <Header isWhite />
-      <h1 className="title_agendamento">Lista de agendamentos</h1>
-      <div className="agendamentos_adm">
-        {agendamentos.map((agendamento) => (
-          <ul key={agendamento.id} className="lista_agendamento">
-            <li>Nome: {agendamento.nome}</li>
-            <li>Contato: {agendamento.email}</li>
-            <li>Data: {agendamento.data}</li>
-            <li>Hora: {agendamento.horario}</li>
-            <br />
-          </ul>
-        ))}
-      </div>
-      <Footer />
+      <div className="container">
+        <Header isWhite />
+        <h1 className="title_agendamento">Lista de agendamentos</h1>
+        <div className="agendamentos_adm">
+          {agendamentos.map((agendamento, index) => (
+            <ul key={index} className="lista_agendamento">
+              <li>Nome: {agendamento.nome}</li>
+              <li>Contato: {agendamento.email}</li>
+              <li>Data: {agendamento.data}</li>
+              <li>Hora: {agendamento.horario}</li>
+              <br />
+            </ul>
+          ))}
+        </div>
+        <Footer />
       </div>
     </>
   );
