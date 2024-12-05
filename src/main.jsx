@@ -5,6 +5,7 @@ import Login from '../src/pages/login/index';
 import Register from '../src/pages/register/index';
 import Calendar from '../src/pages/calendar/index';
 import Inicio from '../src/pages/inicio/index';
+import Adm from '../src/pages/adm/index';
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,11 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <Inicio />,
+  },
+
+  {
+    path: '/adm',
+    element: <Adm />,
   }
 
 ]);

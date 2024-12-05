@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./agendamento.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-datepicker/dist/react-datepicker-cssmodules.css";
-import ptBR from "date-fns/locale/pt-BR"; 
+import ptBR from "date-fns/locale/pt-BR";
 import Modal from "react-modal";
 import { FaCircleUser } from "react-icons/fa6";
 import { CiClock2 } from "react-icons/ci";
@@ -11,26 +11,19 @@ import { VscCheckAll } from "react-icons/vsc";
 import Header from "../../components/header";
 import Footer from "../../components/Footer";
 import { format } from "date-fns";
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, remove, set, get } from "firebase/database";
 import { getAuth } from "firebase/auth";
 
-
-export const setItem = (key, value) => {
-  localStorage.setItem(key, JSON.stringify(value));
-};
-
-export const getItem = (key) => {
-  return JSON.parse(localStorage.getItem(key));
-};
 
 const Agendamento = () => {
   const [dataSelecionada, setDataSeleciona] = useState(null);
   const [horarioSelecionado, setHorarioSelecionado] = useState(null);
   const [botaoAtivo, setBotaoAtivo] = useState(false);
   const [agendamentoRealizado, setAgendamentoRealizado] = useState(false);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const usuarioLogado = getItem("usuarioLogado");
-
+  
+  const auth = getAuth();
+  const usuarioLogado = auth.currentUser;
+  
   const horariosDisponiveis = [
     "09:00",
     "10:00",
@@ -48,14 +41,6 @@ const Agendamento = () => {
     setBotaoAtivo(true);
   };
 
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
-
   const handleDataChange = (data) => {
     setDataSeleciona(data);
     setHorarioSelecionado(null);
@@ -63,52 +48,93 @@ const Agendamento = () => {
   };
 
   const salvarAgendamento = (data, horario) => {
-    const auth = getAuth();
-    const database = getDatabase();
-    const dataFormatada = format(dataSelecionada, "dd/MM/yyyy");
-    
-    const usuarioLogado = getItem("usuarioLogado");
-  
     if (usuarioLogado) {
+      const database = getDatabase();
       const userId = usuarioLogado.uid;
-  
-      const agendamentoRef = ref(database, `agendamentos/${userId}`);
-      const dataFormatada = format(data, "dd/MM/yyyy"); 
+      const dataFormatada = format(data, "dd/MM/yyyy");
 
+      const agendamentoRef = ref(database, `agendamentos/${userId}`);
       set(agendamentoRef, {
         data: dataFormatada,
         horario: horario,
-        nome: usuarioLogado.nome,
+        nome: usuarioLogado.displayName,
+        email: usuarioLogado.email,
+        
       })
-        .then(() => {
-          console.log("Agendamento salvo com sucesso!");
-        })
-        .catch((error) => {
-          console.error("Erro ao salvar agendamento: ", error);
-        });
+      .then(() => {
+        console.log("Agendamento salvo com sucesso!");
+      })
+      .catch((error) => {
+        console.error("Erro ao salvar agendamento: ", error);
+      });
     } else {
       console.error("Usuário não logado.");
     }
   };
   
+  console.log("Usuario logado:", usuarioLogado);
+  console.log("Nome do usuario:", usuarioLogado ? usuarioLogado.displayName : "Não disponível");
+  const cancelarAgendamento = () => {
+    if (usuarioLogado) {
+      const database = getDatabase();
+      const userId = usuarioLogado.uid;
+      const agendamentoRef = ref(database, `agendamentos/${userId}`);
+
+      remove(agendamentoRef)
+        .then(() => {
+          console.log("Agendamento cancelado com sucesso!");
+          setDataSeleciona(null);
+          setHorarioSelecionado(null);
+          setBotaoAtivo(false);
+          setAgendamentoRealizado(false);
+          alert("Agendamento cancelado.");
+        })
+        .catch((error) => {
+          console.error("Erro ao cancelar agendamento: ", error);
+          alert("Erro ao cancelar agendamento. Tente novamente.");
+        });
+    } else {
+      console.error("Usuário não logado.");
+    }
+  };
+
+  const remarcarAgendamento = () => {
+    setDataSeleciona(null);
+    setHorarioSelecionado(null);
+    setBotaoAtivo(false);
+    setAgendamentoRealizado(false);
+  };
+
+  const exibirDetalhesAgendamento = () => {
+    const nomeUsuario = usuarioLogado ? usuarioLogado.displayName : "Usuário não identificado";
+    const dataFormatada = dataSelecionada ? format(dataSelecionada, "dd/MM/yyyy") : "Data não selecionada";
+    console.log("NOME" + nomeUsuario)
+    return (
+      <div className="dados-agendamento">
+        <h2 className="title">Detalhes do Agendamento</h2>
+        <p>Nome: {nomeUsuario}</p>
+        <p>Data: {dataFormatada}</p>
+        <p>Horário: {horarioSelecionado}</p>
+        <div className="acoes_agendamento">
+          <button className="btn_remarcar" onClick={remarcarAgendamento}>
+            Remarcar
+          </button>
+          <button className="btn_cancelar" onClick={cancelarAgendamento}>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   const handleAgendar = () => {
     console.log("Data selecionada:", dataSelecionada);
     console.log("Horário selecionado:", horarioSelecionado);
-  
+
     salvarAgendamento(dataSelecionada, horarioSelecionado);
-    setDataSeleciona(null);
-    setHorarioSelecionado(null);
-    setBotaoAtivo(false);
     setAgendamentoRealizado(true);
-  
-    openModal();
-  
-    setTimeout(() => {
-      setAgendamentoRealizado(false);
-    }, 5000);
   };
-  
+
 
   return (
     <>
@@ -117,14 +143,21 @@ const Agendamento = () => {
         <div className="container_geral_calendario">
           <div className="agendamento">
             <section className="marcacao_data">
+
               <div className="titulo_inicial">
-                <h1>Olá, vamos combinar um horário? </h1>
+                <h1>
+                  {agendamentoRealizado
+                    ? "Seu agendamento está confirmado!" // Novo título quando o agendamento for realizado
+                    : "Olá, vamos combinar um horário?"}
+                </h1>
                 <p style={{ fontSize: "14px", marginTop: "8px" }}>
-                  Agende 30-40 minutos de conversa para resolver suas pendências
-                  com o IRPF
+                  {agendamentoRealizado
+                    ? "É só comparecer ao polo de sua cidade na data e horário combinado." // Novo texto explicativo
+                    : "Agende 30-40 minutos de conversa para resolver suas pendências com o IRPF"}
                 </p>
               </div>
-              <div className="calendar-container">
+
+              <div className="calendar-container" style={{ display: agendamentoRealizado ? 'none' : 'block' }}>
                 <h2 className="title">Escolha uma data:</h2>
                 <DatePicker
                   selected={dataSelecionada}
@@ -132,42 +165,43 @@ const Agendamento = () => {
                   dateFormat="dd/MM/yyyy"
                   minDate={new Date()}
                   locale={ptBR}
-                  filterDate={(date) =>
-                    date.getDay() !== 6 && date.getDay() !== 0
-                  }
+                  filterDate={(date) => date.getDay() !== 6 && date.getDay() !== 0}
                   inline
                   calendarClassName="custom-calendar"
                   wrapperClassName="datePicker"
                 />
               </div>
+
               <div className="horario-container">
-                <h2 className="title">Seu melhor horário:</h2>
-                <div className="selecionar_horarios">
-                  <section className="horarios">
-                    {horariosDisponiveis.map((horario, index) => (
+                {!agendamentoRealizado ? (
+                  <>
+                    <h2 className="title">Seu melhor horário:</h2>
+                    <div className="selecionar_horarios">
+                      <section className="horarios">
+                        {horariosDisponiveis.map((horario) => (
+                          <button
+                            key={horario}
+                            className={`btn_horario ${horario === horarioSelecionado ? "ativo" : "inativo"}`}
+                            onClick={() => handleHorarioSelecionado(horario)}
+                          >
+                            {horario}
+                          </button>
+                        ))}
+                      </section>
+                    </div>
+                    <div className="btn_concluir">
                       <button
-                        key={horario}
-                        className={`btn_horario ${
-                          horario === horarioSelecionado ? "ativo" : "inativo"
-                        }`}
-                        onClick={() => handleHorarioSelecionado(horario)}
+                        className={`btn_agendar ${botaoAtivo ? "ativo" : "inativo"}`}
+                        onClick={handleAgendar}
+                        disabled={!botaoAtivo}
                       >
-                        {horario}
+                        Agendar
                       </button>
-                    ))}
-                  </section>
-                </div>
-                <div className="btn_concluir">
-                  <button
-                    className={`btn_agendar ${
-                      botaoAtivo ? "ativo" : "inativo"
-                    }`}
-                    onClick={handleAgendar}
-                    disabled={!botaoAtivo}
-                  >
-                    Agendar
-                  </button>
-                </div>
+                    </div>
+                  </>
+                ) : (
+                  exibirDetalhesAgendamento()
+                )}
               </div>
             </section>
 
@@ -178,7 +212,7 @@ const Agendamento = () => {
                     <FaCircleUser size={80} />
                   </div>
                   <div style={{ display: "flex", justifyContent: "center" }}>
-                    {usuarioLogado ? usuarioLogado.nome : "usuario"}
+                    {usuarioLogado ? usuarioLogado.displayName : "Usuário não identificado"}
                   </div>
                 </div>
                 <div className="dados_atendimento">
@@ -193,9 +227,7 @@ const Agendamento = () => {
                   </span>
                 </div>
               </div>
-              <div
-                style={{ borderBottom: "solid 2px #DEDBDB", width: "500px" }}
-              ></div>
+              <div style={{ borderBottom: "solid 2px #DEDBDB", width: "500px" }}></div>
               <div className="texto-principal">
                 <p className="p1">
                   O Núcleo de Apoio Contábil e Fiscal (NAF) conta com o
@@ -217,7 +249,18 @@ const Agendamento = () => {
               </div>
             </section>
           </div>
-          <Modal
+        </div>
+      </div>
+      <Footer />
+    </>
+  );
+
+};
+
+export default Agendamento;
+
+
+{/* <Modal
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
             contentLabel="Mensagem de Agendamento"
@@ -250,12 +293,4 @@ const Agendamento = () => {
                 </div>
               </div>
             </div>
-          </Modal>
-        </div>
-      </div>
-      <Footer />
-    </>
-  );
-};
-
-export default Agendamento;
+          </Modal> */}

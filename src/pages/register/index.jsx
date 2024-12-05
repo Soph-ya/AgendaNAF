@@ -4,8 +4,8 @@ import "./register.css";
 import accountingg from "../../img/accountingg.jpg";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import { getDatabase, ref, set } from "firebase/database";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getDatabase, ref, remove, set } from "firebase/database";
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import '../../assets/firebaseConfig';
 
 const Register = () => {
@@ -15,7 +15,6 @@ const Register = () => {
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [nome, setNome] = useState("");
   const [cidade, setCidade] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
   const [tipoUsuario, setTipoUsuario] = useState("");
   const [matricula, setMatricula] = useState("");
   const [cpf, setCpf] = useState("");
@@ -29,7 +28,6 @@ const Register = () => {
       !confirmarSenha ||
       !nome ||
       !cidade ||
-      !dataNascimento ||
       !tipoUsuario
     ) {
       alert("Por favor, preencha todos os campos obrigatórios.");
@@ -67,7 +65,6 @@ const Register = () => {
       senha,
       nome,
       cidade,
-      dataNascimento,
       tipoUsuario,
       id: new Date().getTime(),
       ...(tipoUsuario === "Aluno" || tipoUsuario === "Professor" ? { matricula } : {}),
@@ -77,6 +74,10 @@ const Register = () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
       const userId = userCredential.user.uid;
+  
+      await updateProfile(userCredential.user, {
+        displayName: nome,
+      });
   
       await set(ref(database, `usuarios/${userId}`), novoUsuario);
   
@@ -139,20 +140,6 @@ const Register = () => {
                   onChange={(e) => setCidade(e.target.value)}
                 />
               </div>
-
-              <div className="campo-register">
-                <label className="label-register" htmlFor="dataNascimento">
-                  Data de Nascimento
-                </label>
-                <input
-                  type="date"
-                  name="dataNascimento"
-                  id="dataNascimento"
-                  value={dataNascimento}
-                  onChange={(e) => setDataNascimento(e.target.value)}
-                />
-              </div>
-
               <div className="campo-register">
                 <select
                   name="tipoUsuario"
