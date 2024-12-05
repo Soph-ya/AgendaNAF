@@ -1,0 +1,61 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+
+ .container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; 
+  }
+
+
+.agendamentos_adm {
+    display: flex;
+    flex-direction: grid;
+  
+  }
+
+  .title_agendamento {
+
+    font-size: 50px;
+    color: black;
+    font-family: 'Josefin Sans', cursive;
+    justify-content: center;
+    display: flex;
+    flex-direction: center;font-weight: 1000;
+    margin: 10px 0px 0px 3px;
+    padding: 50px 0px 70px 0px;
+
+
+  }
+  
+   .lista_agendamento {
+    color: black;
+    text-align: justify;
+    display: flex;
+    flex-direction: grid;
+    font-size: 20px;
+  
+  
+  
+  } 
+  
+  .lista_agendamento {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: center;
+    height: 100vh;
+    margin: 10px 0px 0px 3px;
+    background-color:#006B64;
+    text-align: justify;
+    color: #ffff;
+    border: solid;
+    border-radius: 15px;
+    font-family: 'Rethink Sans', sans-serif;
+    padding: 10px;
+    width: 500px;
+    height: 90%;
+  }

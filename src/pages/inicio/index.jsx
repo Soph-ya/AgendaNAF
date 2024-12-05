@@ -6,8 +6,10 @@ import account from "../../img/account.jpg";
 const Inicio = () => {
   return (
     <>
+    <div className="container">
       <Header />
       <div className="home">
+        <div className="conteudo">
         <main>
           <div className="title-section">
             <img
@@ -66,6 +68,8 @@ const Inicio = () => {
             </p>
           </section>
         </main>
+      </div>
+      </div>
       </div>
       <Footer />
     </>

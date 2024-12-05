@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { getDatabase, ref, child, get } from "firebase/database";
+import "./adm.css";
+import Header from "../../components/header";
+import Footer from "../../components/Footer";
 
 function Adm() {
   const [agendamentos, setAgendamentos] = useState([]);
@@ -29,10 +32,12 @@ function Adm() {
   
   return (
     <>
-      <h1>Agendamentos</h1>
-      <div>
+    <div className="container">
+    <Header isWhite />
+      <h1 className="title_agendamento">Lista de agendamentos</h1>
+      <div className="agendamentos_adm">
         {agendamentos.map((agendamento) => (
-          <ul key={agendamento.id}>
+          <ul key={agendamento.id} className="lista_agendamento">
             <li>Nome: {agendamento.nome}</li>
             <li>Contato: {agendamento.email}</li>
             <li>Data: {agendamento.data}</li>
@@ -40,6 +45,8 @@ function Adm() {
             <br />
           </ul>
         ))}
+      </div>
+      <Footer />
       </div>
     </>
   );

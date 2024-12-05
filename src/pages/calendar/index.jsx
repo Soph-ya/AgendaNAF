@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./agendamento.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -20,6 +20,7 @@ const Agendamento = () => {
   const [horarioSelecionado, setHorarioSelecionado] = useState(null);
   const [botaoAtivo, setBotaoAtivo] = useState(false);
   const [agendamentoRealizado, setAgendamentoRealizado] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   
   const auth = getAuth();
   const usuarioLogado = auth.currentUser;
@@ -35,6 +36,13 @@ const Agendamento = () => {
     "17:00",
     "18:00",
   ];
+
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
 
   const handleHorarioSelecionado = (horario) => {
     setHorarioSelecionado(horario);
@@ -111,6 +119,7 @@ const Agendamento = () => {
     console.log("NOME" + nomeUsuario)
     return (
       <div className="dados-agendamento">
+        <div className="dados">
         <h2 className="title">Detalhes do Agendamento</h2>
         <p>Nome: {nomeUsuario}</p>
         <p>Data: {dataFormatada}</p>
@@ -122,7 +131,13 @@ const Agendamento = () => {
           <button className="btn_cancelar" onClick={cancelarAgendamento}>
             Cancelar
           </button>
+          </div>
         </div>
+        <div className="feedback">
+                <button className="btn_modal" onClick={openModal}>
+                  Deixe seu feedback!
+                </button>
+              </div>
       </div>
     );
   };
@@ -248,6 +263,36 @@ const Agendamento = () => {
                 </p>
               </div>
             </section>
+      { <Modal
+                  isOpen={modalIsOpen}
+                  onRequestClose={closeModal}
+                  contentLabel="Mensagem de Agendamento"
+                  className="modal"
+                >
+                  <div>
+                    <div className="modal_conteudo">
+                      <div className="mensagem_agendamento">
+                        <h2 style={{ fontWeight: "bolder", fontSize: "18px", padding: "50px" }}>
+                          Agendamento realizado com sucesso!
+                        </h2>
+                        <p className="paragrafo_atendimento">
+                          Gostou do nosso atendimento? deixe um feedback para que possamos continuar melhorando
+                        </p>
+                      </div>
+                      <div className="feedback">
+                        <textarea
+                          id="feedback"
+                          name="feedback"
+                          rows="4"
+                          cols="50"
+                        ></textarea>
+                        <button className="btn_fechar" onClick={closeModal}>
+                          Enviar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </Modal> }
           </div>
         </div>
       </div>
@@ -259,38 +304,3 @@ const Agendamento = () => {
 
 export default Agendamento;
 
-
-{/* <Modal
-            isOpen={modalIsOpen}
-            onRequestClose={closeModal}
-            contentLabel="Mensagem de Agendamento"
-            className="modal"
-          >
-            <div>
-              <div className="modal_conteudo">
-                <div className="mensagem_agendamento">
-                  <h2 style={{ fontWeight: "bolder", fontSize: "18px" }}>
-                    Agendamento realizado com sucesso!
-                  </h2>
-                  <p>
-                    Um e-mail será enviado para sua caixa de mensagem com mais
-                    detalhes do seu agendamento.
-                  </p>
-                </div>
-                <div className="feedback">
-                  <label htmlFor="feedback">
-                    Deixe seu feedback: <br />
-                  </label>
-                  <textarea
-                    id="feedback"
-                    name="feedback"
-                    rows="4"
-                    cols="50"
-                  ></textarea>
-                  <button className="btn_fechar" onClick={closeModal}>
-                    Enviar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </Modal> */}

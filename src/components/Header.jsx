@@ -18,6 +18,7 @@ const Header = ({ isWhite }) => {
         <nav className="nav-style">
           <Link to="/login" className='link-style' style={linkStyle}>Login</Link>
           <Link to="/register" className='link-style' style={linkStyle}>Registro</Link>
+          <Link to="/admlogin" className='link-style' style={linkStyle}>Administrador</Link>
         </nav>
       )}
     </header>
