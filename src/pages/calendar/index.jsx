@@ -21,10 +21,10 @@ const Agendamento = () => {
   const [botaoAtivo, setBotaoAtivo] = useState(false);
   const [agendamentoRealizado, setAgendamentoRealizado] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  
+
   const auth = getAuth();
   const usuarioLogado = auth.currentUser;
-  
+
   const horariosDisponiveis = [
     "09:00",
     "10:00",
@@ -49,37 +49,63 @@ const Agendamento = () => {
     setBotaoAtivo(true);
   };
 
-  const handleDataChange = (data) => {
-    setDataSeleciona(data);
-    setHorarioSelecionado(null);
-    setBotaoAtivo(false);
-  };
-
   const salvarAgendamento = (data, horario) => {
     if (usuarioLogado) {
       const database = getDatabase();
-      const userId = usuarioLogado.uid;
       const dataFormatada = format(data, "dd/MM/yyyy");
-
-      const agendamentoRef = ref(database, `agendamentos/${userId}`);
-      set(agendamentoRef, {
-        data: dataFormatada,
-        horario: horario,
-        nome: usuarioLogado.displayName,
-        email: usuarioLogado.email,
-        
-      })
-      .then(() => {
-        console.log("Agendamento salvo com sucesso!");
-      })
-      .catch((error) => {
-        console.error("Erro ao salvar agendamento: ", error);
+      const agendamentoRef = ref(database, `agendamentos/${dataFormatada}/${horario}`);
+      get(agendamentoRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          alert("Esse horário já está ocupado. Por favor, escolha outro.");
+        } else {
+          set(agendamentoRef, {
+            userId: usuarioLogado.uid,
+            nome: usuarioLogado.displayName,
+            email: usuarioLogado.email,
+          })
+            .then(() => {
+              console.log("Agendamento salvo com sucesso!");
+              setAgendamentoRealizado(true);
+            })
+            .catch((error) => {
+              console.error("Erro ao salvar agendamento: ", error);
+            });
+        }
+      }).catch((error) => {
+        console.error("Erro ao verificar disponibilidade: ", error);
       });
     } else {
       console.error("Usuário não logado.");
     }
   };
-  
+
+  const [horariosOcupados, setHorariosOcupados] = useState([]);
+
+  const verificarHorariosOcupados = (data) => {
+    const database = getDatabase();
+    const dataFormatada = format(data, "dd/MM/yyyy");
+    const agendamentoRef = ref(database, `agendamentos/${dataFormatada}`);
+
+    get(agendamentoRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        const horarios = Object.keys(snapshot.val());
+        setHorariosOcupados(horarios);
+      } else {
+        setHorariosOcupados([]);
+      }
+    }).catch((error) => {
+      console.error("Erro ao verificar horários ocupados: ", error);
+    });
+  };
+
+  const handleDataChange = (data) => {
+    setDataSeleciona(data);
+    verificarHorariosOcupados(data);
+    setHorarioSelecionado(null);
+    setBotaoAtivo(false);
+  };
+
+
   console.log("Usuario logado:", usuarioLogado);
   console.log("Nome do usuario:", usuarioLogado ? usuarioLogado.displayName : "Não disponível");
   const cancelarAgendamento = () => {
@@ -120,24 +146,24 @@ const Agendamento = () => {
     return (
       <div className="dados-agendamento">
         <div className="dados">
-        <h2 className="title">Detalhes do Agendamento</h2>
-        <p>Nome: {nomeUsuario}</p>
-        <p>Data: {dataFormatada}</p>
-        <p>Horário: {horarioSelecionado}</p>
-        <div className="acoes_agendamento">
-          <button className="btn_remarcar" onClick={remarcarAgendamento}>
-            Remarcar
-          </button>
-          <button className="btn_cancelar" onClick={cancelarAgendamento}>
-            Cancelar
-          </button>
+          <h2 className="title">Detalhes do Agendamento</h2>
+          <p>Nome: {nomeUsuario}</p>
+          <p>Data: {dataFormatada}</p>
+          <p>Horário: {horarioSelecionado}</p>
+          <div className="acoes_agendamento">
+            <button className="btn_remarcar" onClick={remarcarAgendamento}>
+              Remarcar
+            </button>
+            <button className="btn_cancelar" onClick={cancelarAgendamento}>
+              Cancelar
+            </button>
           </div>
         </div>
         <div className="feedback">
-                <button className="btn_modal" onClick={openModal}>
-                  Deixe seu feedback!
-                </button>
-              </div>
+          <button className="btn_modal" onClick={openModal}>
+            Deixe seu feedback!
+          </button>
+        </div>
       </div>
     );
   };
@@ -162,12 +188,12 @@ const Agendamento = () => {
               <div className="titulo_inicial">
                 <h1>
                   {agendamentoRealizado
-                    ? "Seu agendamento está confirmado!" // Novo título quando o agendamento for realizado
+                    ? "Seu agendamento está confirmado!"
                     : "Olá, vamos combinar um horário?"}
                 </h1>
                 <p style={{ fontSize: "14px", marginTop: "8px" }}>
                   {agendamentoRealizado
-                    ? "É só comparecer ao polo de sua cidade na data e horário combinado." // Novo texto explicativo
+                    ? "É só comparecer ao polo de sua cidade na data e horário combinado."
                     : "Agende 30-40 minutos de conversa para resolver suas pendências com o IRPF"}
                 </p>
               </div>
@@ -198,10 +224,12 @@ const Agendamento = () => {
                             key={horario}
                             className={`btn_horario ${horario === horarioSelecionado ? "ativo" : "inativo"}`}
                             onClick={() => handleHorarioSelecionado(horario)}
+                            disabled={horariosOcupados.includes(horario)}
                           >
                             {horario}
                           </button>
                         ))}
+
                       </section>
                     </div>
                     <div className="btn_concluir">
@@ -263,36 +291,36 @@ const Agendamento = () => {
                 </p>
               </div>
             </section>
-      { <Modal
-                  isOpen={modalIsOpen}
-                  onRequestClose={closeModal}
-                  contentLabel="Mensagem de Agendamento"
-                  className="modal"
-                >
-                  <div>
-                    <div className="modal_conteudo">
-                      <div className="mensagem_agendamento">
-                        <h2 style={{ fontWeight: "bolder", fontSize: "18px", padding: "50px" }}>
-                          Agendamento realizado com sucesso!
-                        </h2>
-                        <p className="paragrafo_atendimento">
-                          Gostou do nosso atendimento? deixe um feedback para que possamos continuar melhorando
-                        </p>
-                      </div>
-                      <div className="feedback">
-                        <textarea
-                          id="feedback"
-                          name="feedback"
-                          rows="4"
-                          cols="50"
-                        ></textarea>
-                        <button className="btn_fechar" onClick={closeModal}>
-                          Enviar
-                        </button>
-                      </div>
-                    </div>
+            {<Modal
+              isOpen={modalIsOpen}
+              onRequestClose={closeModal}
+              contentLabel="Mensagem de Agendamento"
+              className="modal"
+            >
+              <div>
+                <div className="modal_conteudo">
+                  <div className="mensagem_agendamento">
+                    <h2 style={{ fontWeight: "bolder", fontSize: "18px", padding: "50px" }}>
+                      Agendamento realizado com sucesso!
+                    </h2>
+                    <p className="paragrafo_atendimento">
+                      Gostou do nosso atendimento? deixe um feedback para que possamos continuar melhorando
+                    </p>
                   </div>
-                </Modal> }
+                  <div className="feedback">
+                    <textarea
+                      id="feedback"
+                      name="feedback"
+                      rows="4"
+                      cols="50"
+                    ></textarea>
+                    <button className="btn_fechar" onClick={closeModal}>
+                      Enviar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Modal>}
           </div>
         </div>
       </div>
