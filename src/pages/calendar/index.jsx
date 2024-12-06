@@ -50,63 +50,65 @@ const Agendamento = () => {
   };
 
   const salvarAgendamento = (data, horario) => {
-    if (usuarioLogado) {
-      const database = getDatabase();
-      const dataFormatada = format(data, "dd/MM/yyyy");
-      const agendamentoRef = ref(database, `agendamentos/${dataFormatada}/${horario}`);
-      get(agendamentoRef).then((snapshot) => {
-        if (snapshot.exists()) {
-          alert("Esse horário já está ocupado. Por favor, escolha outro.");
-        } else {
-          set(agendamentoRef, {
-            userId: usuarioLogado.uid,
-            nome: usuarioLogado.displayName,
-            email: usuarioLogado.email,
-          })
-            .then(() => {
-              console.log("Agendamento salvo com sucesso!");
-              setAgendamentoRealizado(true);
-            })
-            .catch((error) => {
-              console.error("Erro ao salvar agendamento: ", error);
-            });
-        }
-      }).catch((error) => {
-        console.error("Erro ao verificar disponibilidade: ", error);
+    const database = getDatabase();
+    const userId = usuarioLogado.uid;
+    const dataFormatada = format(data, "dd/MM/yyyy");
+    const userAgendamentoRef = ref(database, `agendamentos/${userId}`);
+    set(userAgendamentoRef, {
+      data: dataFormatada,
+      horario: horario,
+      nome: usuarioLogado.displayName,
+      email: usuarioLogado.email,
+    })
+      .then(() => {
+        console.log("Agendamento salvo ou atualizado com sucesso!");
+        setAgendamentoRealizado(true);
+      })
+      .catch((error) => {
+        console.error("Erro ao salvar ou atualizar o agendamento: ", error);
       });
-    } else {
-      console.error("Usuário não logado.");
-    }
   };
-
+  
+  
+  
+  const handleDataChange = (date) => {
+    setDataSeleciona(date);
+    verificarHorariosOcupados(date);
+  };
+  
+  
   const [horariosOcupados, setHorariosOcupados] = useState([]);
 
   const verificarHorariosOcupados = (data) => {
     const database = getDatabase();
     const dataFormatada = format(data, "dd/MM/yyyy");
-    const agendamentoRef = ref(database, `agendamentos/${dataFormatada}`);
-
-    get(agendamentoRef).then((snapshot) => {
-      if (snapshot.exists()) {
-        const horarios = Object.keys(snapshot.val());
-        setHorariosOcupados(horarios);
-      } else {
-        setHorariosOcupados([]);
-      }
-    }).catch((error) => {
-      console.error("Erro ao verificar horários ocupados: ", error);
-    });
-  };
-
-  const handleDataChange = (data) => {
-    setDataSeleciona(data);
-    verificarHorariosOcupados(data);
-    setHorarioSelecionado(null);
-    setBotaoAtivo(false);
+    const agendamentosRef = ref(database, `agendamentos`);
+  
+    get(agendamentosRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const agendamentos = snapshot.val();
+          const horariosIndisponiveis = [];
+          
+          Object.values(agendamentos).forEach((agendamento) => {
+            if (agendamento.data === dataFormatada) {
+              horariosIndisponiveis.push(agendamento.horario);
+            }
+          });
+  
+          setHorariosOcupados(horariosIndisponiveis);
+        } else {
+          setHorariosOcupados([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Erro ao verificar horários ocupados: ", error);
+      });
   };
 
 
   console.log("Usuario logado:", usuarioLogado);
+  
   console.log("Nome do usuario:", usuarioLogado ? usuarioLogado.displayName : "Não disponível");
   const cancelarAgendamento = () => {
     if (usuarioLogado) {
@@ -151,9 +153,9 @@ const Agendamento = () => {
           <p>Data: {dataFormatada}</p>
           <p>Horário: {horarioSelecionado}</p>
           <div className="acoes_agendamento">
-            <button className="btn_remarcar" onClick={remarcarAgendamento}>
-              Remarcar
-            </button>
+          <button className="btn_remarcar" onClick={remarcarAgendamento}>
+            Remarcar
+          </button>
             <button className="btn_cancelar" onClick={cancelarAgendamento}>
               Cancelar
             </button>
