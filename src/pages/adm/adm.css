@@ -52,3 +52,30 @@ html, body {
   font-size: 18px;
   margin-bottom: 10px;
 }
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; 
+  justify-content: start; 
+  margin: 0 20px;
+  padding: 10px 0 15px 10px;
+
+}
+
+.btn_todos:hover {
+  background-color: #006b64c8; 
+}
+
+.btn_todos {
+  background-color: #006B64;
+  padding: 8px;
+  text-align: center;
+  color: #ffff;
+  font-size: 15px;
+  border-radius: 5px;
+  width: 100px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
